@@ -1,0 +1,80 @@
+function setTableView() {
+
+    var url = $("#restApi").val();
+    var id = $("#id").val();
+    data = {
+        id: id
+    };
+    $.ajax(
+        {
+            url: url,
+            type: 'GET',
+            data: data,
+            success: function (responce) {
+                var columnarray = (responce.ColumnArray);
+                var title = responce.title;
+                var data_array = responce.data_array;
+                var tableHtml = "";
+                tableHtml = createHeaderOfTable(columnarray, data_array);
+                $("#commontable").html(tableHtml);
+                $("#viewname").html(title)
+                $("#title").html(title)
+            },
+            error: function (error) {
+
+            }
+        }
+    )
+}
+
+function createHeaderOfTable(columnarray, data_array) {
+    var table = "<table border = '2'>" +
+        "<thead>" +
+        "<tr>";
+    for (var i = 0; i < columnarray.length; i++) {
+        table += "<td>" + columnarray[i].name + "</td>"
+    }
+    table += "</tr>" +
+        "</thead>";
+    table += "<tbody>";
+    var count = 1;
+    for (var i=0; i < data_array.length; i++) {
+        table += "<tr>";
+        for (var j = 0; j < columnarray.length; j++) {
+            var flag = false;
+            var n = "";
+            for (var data in data_array[i]) {
+                if (data == columnarray[j].columnid || columnarray[j].isSrno || columnarray[j].columnid == "checkbox") {
+                    flag = true;
+                    n = data;
+                }
+            }
+            if(flag){
+                var tabledata = data_array[i][n];
+                var trimdata = tabledata.length > 50 ? tabledata.slice(0,50)+"..." : tabledata;
+                if(columnarray[j].isSrno) {
+                    trimdata = count++;
+                }
+                if(columnarray[j].columnid == "checkbox") {
+                    var trimdata = "<input class='form-check-input' type='checkbox' name='isCheckbox' id='isCheckbox'>";
+                }
+                if(columnarray[j].columnid == "actionButton") {
+                    var trimdata = "<input class='form-check-input' type='checkbox' name='isCheckbox' id='isCheckbox'>";
+                }
+                // table += '<td onclick="viewdata(`'+tabledata+'`);">' + trimdata + '</td>'
+                table += '<td>' + trimdata + '</td>'
+            }
+            else{
+                table += "<td> - </td>"
+            }
+        }
+        table += "</tr>"
+    }
+    "</table>";
+    return table;
+}
+
+function viewdata(data)
+{
+    alert(data);
+}
